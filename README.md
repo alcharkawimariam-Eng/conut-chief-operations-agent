@@ -94,29 +94,6 @@ graph TD
     F --> G
     G --> H[Structured JSON Output]
 
-            ┌────────────────────┐
-            │   Raw Operational  │
-            │       Data         │
-            └─────────┬──────────┘
-                      ↓
-            ┌────────────────────┐
-            │ Data Cleaning &    │
-            │ Feature Engineering│
-            └─────────┬──────────┘
-                      ↓
-            ┌────────────────────┐
-            │  Model-Ready Data  │
-            └─────────┬──────────┘
-                      ↓
-      ┌───────────────┼────────────────┐
-      ↓               ↓                ↓
- Forecast         Combo Engine     Staffing
-      ↓               ↓                ↓
-          ┌────────────────────┐
-          │ Expansion Scoring  │
-          └─────────┬──────────┘
-                    ↓
-          Structured JSON Output
 
 2️⃣ Feature Engineering
 
