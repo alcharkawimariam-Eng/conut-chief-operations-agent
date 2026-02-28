@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import pandas as pd
 
 def forecast_branch(branch_id, horizon=30, file_path="data/clean/monthly_branch_sales_clean.csv"):
@@ -51,3 +52,26 @@ def forecast_branch(branch_id, horizon=30, file_path="data/clean/monthly_branch_
         "confidence": "medium",
         "forecast": forecast_values
     }
+=======
+# forecast.py
+import pandas as pd
+
+def forecast_branch(branch_name, horizon=30):
+    try:
+        df = pd.read_csv("data/prepared/cleaned_monthly_branch_sales.csv")
+    except FileNotFoundError:
+        return {"analysis_name": "demand_forecasting", "error": "Clean branch sales file not found yet"}
+
+    # Filter the branch by name
+    branch_df = df[df['Branch'] == branch_name]
+
+    total_sales = branch_df['Total_Sales'].sum() if not branch_df.empty else 0
+    
+    return {
+        "analysis_name": "demand_forecasting",
+        "inputs": {"branch_name": branch_name, "horizon": horizon},
+        "key_findings": [f"Forecasted total sales for next {horizon} days: {total_sales}"],
+        "recommendations": ["Adjust staffing based on forecasted demand"],
+        "confidence": "medium"
+    }
+>>>>>>> main
