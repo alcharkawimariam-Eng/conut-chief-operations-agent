@@ -77,12 +77,11 @@ conut-chief-operations-agent/
 │   └── branch_json_export.py       # Final intelligence formatting
 │
 └── README.md
-
+```
 📊 Data Pipeline
 1️⃣ Data Cleaning
 
 Raw Excel datasets were cleaned and standardized.
-## 🧱 High-Level Architecture
 ## 🧱 High-Level Architecture
 
 ```text
@@ -109,7 +108,7 @@ Raw Excel datasets were cleaned and standardized.
           └─────────┬──────────┘
                     ↓
           Structured JSON Output
-
+```
 
 2️⃣ Feature Engineering
 
