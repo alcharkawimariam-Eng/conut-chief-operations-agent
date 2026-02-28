@@ -83,16 +83,32 @@ conut-chief-operations-agent/
 
 Raw Excel datasets were cleaned and standardized.
 ## 🧱 High-Level Architecture
-graph TD
-    A[Raw Operational Data] --> B[Data Cleaning & Feature Engineering]
-    B --> C[Model-Ready Data]
-    C --> D[Forecast Module]
-    C --> E[Combo Engine]
-    C --> F[Staffing Module]
-    D --> G[Expansion Scoring]
-    E --> G
-    F --> G
-    G --> H[Structured JSON Output]
+## 🧱 High-Level Architecture
+
+```text
+            ┌────────────────────┐
+            │   Raw Operational  │
+            │       Data         │
+            └─────────┬──────────┘
+                      ↓
+            ┌────────────────────┐
+            │ Data Cleaning &    │
+            │ Feature Engineering│
+            └─────────┬──────────┘
+                      ↓
+            ┌────────────────────┐
+            │  Model-Ready Data  │
+            └─────────┬──────────┘
+                      ↓
+      ┌───────────────┼────────────────┐
+      ↓               ↓                ↓
+   Forecast      Combo Engine       Staffing
+      ↓               ↓                ↓
+          ┌────────────────────┐
+          │ Expansion Scoring  │
+          └─────────┬──────────┘
+                    ↓
+          Structured JSON Output
 
 
 2️⃣ Feature Engineering
