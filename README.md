@@ -27,69 +27,73 @@ This project was developed as part of an AI Engineering Hackathon to demonstrate
 
 Multi-branch food and beverage businesses generate large volumes of transactional and operational data. However, most organizations lack:
 
-Structured forecasting tools
+* **Structured forecasting tools** to anticipate demand.
+* **Data-driven combo optimization** to increase average order value.
+* **Quantified staffing indicators** to balance labor costs.
+* **Objective expansion scoring** for identifying the next location.
+* **Unified branch-level intelligence** across disparate reports.
 
-Data-driven combo optimization
+**This leads to:**
+* Reactive decision-making.
+* Missed growth opportunities.
+* Operational inefficiencies.
+* Underutilized data assets.
 
-Quantified staffing indicators
+**The goal of this project** was to design a modular analytics engine that converts raw, report-style branch data into actionable operational intelligence.
 
-Objective expansion scoring
-
-Unified branch-level intelligence
-
-This leads to:
-
-Reactive decision-making
-
-Missed growth opportunities
-
-Operational inefficiencies
-
-Underutilized data assets
-
-The goal of this project was to design a modular analytics engine that converts raw branch data into actionable operational intelligence.
+---
 
 🏗 System Architecture
 
-The project follows a layered architecture:
+The project follows a layered, modular architecture designed for scalability:
 
-Raw Data
-   ↓
-Data Cleaning & Feature Engineering
-   ↓
-Model-Ready Structured Data
-   ↓
-Analytics Layer (Forecast / Combo / Staffing / Expansion)
-   ↓
-Structured Decision Outputs (JSON)
+1.  **Raw Data Ingestion:** Handling messy POS report exports.
+2.  **Data Cleaning & Feature Engineering:** Context-aware parsing and numeric normalization.
+3.  **Model-Ready Structured Data:** Flattened, relational CSV formats.
+4.  **Analytics Layer:** Independent modules for Forecasting, Combo Analysis, Staffing, and Expansion.
+5.  **Structured Decision Outputs:** Final intelligence exported as JSON for agentic consumption.
 
 Each analytics module operates independently but shares a common branch-centric design.
 
-📂 Project Structure
+## 📂 Project Structure
+
+```text
 conut-chief-operations-agent/
 │
 ├── data/
-│   ├── clean_raw_data_notebook/
-│   ├── prepared data/
-│   │   └── model_ready/
+│   ├── clean_raw_data_notebook/    # Logic for parsing report-style CSVs
+│   ├── prepared data/              # Intermediate cleaned files
+│   └── model_ready/                # Final CSVs used by analytics modules
 │
 ├── src/
-│   ├── agent.py
-│   ├── api.py
-│   ├── beverage_strategy.py
-│   ├── combo.py
-│   ├── expansion.py
-│   ├── forecast.py
-│   ├── schema.py
-│   ├── staffing.py
-│   └── branch_json_export.py
+│   ├── agent.py                    # Main execution logic
+│   ├── api.py                      # Endpoint for serving insights
+│   ├── beverage_strategy.py        # Division performance analysis
+│   ├── combo.py                    # Market Basket Analysis (Apriori/Association)
+│   ├── expansion.py                # Branch scoring and feasibility logic
+│   ├── forecast.py                 # Time-series demand forecasting
+│   ├── schema.py                   # Data validation and types
+│   ├── staffing.py                 # Labor vs. Revenue efficiency module
+│   └── branch_json_export.py       # Final intelligence formatting
 │
 └── README.md
+
 📊 Data Pipeline
 1️⃣ Data Cleaning
 
 Raw Excel datasets were cleaned and standardized.
 ## 🧱 High-Level Architecture
+graph TD
+    A[Raw Operational Data] --> B[Data Cleaning & Feature Engineering]
+    B --> C[Model-Ready Data]
+    C --> D[Forecast Module]
+    C --> E[Combo Engine]
+    C --> F[Staffing Module]
+    D --> G[Expansion Scoring]
+    E --> G
+    F --> G
+    G --> H[Structured JSON Output]
+
             ┌────────────────────┐
             │   Raw Operational  │
             │       Data         │
