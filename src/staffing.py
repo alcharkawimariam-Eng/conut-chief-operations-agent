@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # src/staffing.py
 import pandas as pd
 
@@ -25,3 +26,30 @@ def estimate_staff(branch_id, day_of_week, file_path="data/clean/attendance_clea
         "recommendations": [f"Schedule ~{avg_staff} staff for {day_of_week}"],
         "confidence": "medium"
     }
+=======
+# staffing.py
+import pandas as pd
+
+def estimate_staff(branch_name, day_of_week=None, hour_block=None):
+    try:
+        df = pd.read_csv("data/prepared/cleaned_attendance_logs.csv")
+    except FileNotFoundError:
+        return {"analysis_name": "staffing_estimation", "error": "Clean attendance file not found yet"}
+
+    # Strip any extra spaces in branch names
+    df['Branch'] = df['Branch'].str.strip()
+
+    # Filter by the correct branch column
+    branch_df = df[df['Branch'] == branch_name]
+
+    # Sum total hours using the correct column
+    total_hours = branch_df['Work_Hours'].sum() if not branch_df.empty else 0
+
+    return {
+        "analysis_name": "staffing_estimation",
+        "inputs": {"branch_name": branch_name, "day_of_week": day_of_week, "hour_block": hour_block},
+        "key_findings": [f"Total staff hours logged: {total_hours}"],
+        "recommendations": ["Schedule staff according to forecasted demand"],
+        "confidence": "medium"
+    }
+>>>>>>> main
