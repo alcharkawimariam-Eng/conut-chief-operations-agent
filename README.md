@@ -72,34 +72,6 @@ The project follows a layered, modular architecture designed for scalability:
 
 Each analytics module operates independently but shares a common branch-centric design.
 
-### 📂 Project Structure
-
-```text
-conut-chief-operations-agent/
-│
-├── data/
-│   ├── clean_raw_data_notebook/    # Logic for parsing report-style CSVs
-│   ├── prepared data/              # Intermediate cleaned files
-│   └── model_ready/                # Final CSVs used by analytics modules
-│
-├── src/
-│   ├── agent.py                    # Main execution logic
-│   ├── api.py                      # Endpoint for serving insights
-│   ├── beverage_strategy.py        # Division performance analysis
-│   ├── combo.py                    # Market Basket Analysis (Apriori/Association)
-│   ├── expansion.py                # Branch scoring and feasibility logic
-│   ├── forecast.py                 # Time-series demand forecasting
-│   ├── schema.py                   # Data validation and types
-│   ├── staffing.py                 # Labor vs. Revenue efficiency module
-│   └── branch_json_export.py       # Final intelligence formatting
-│
-└── README.md
-```
-📊 Data Pipeline
-1️⃣ Data Cleaning
-
-Raw Excel datasets were cleaned and standardized.
-
 ### 🧱 High-Level Architecture
 
 ```text
@@ -128,7 +100,38 @@ Raw Excel datasets were cleaned and standardized.
           Structured JSON Output
 ```
 
-2️⃣ Feature Engineering
+## 📂 Project Structure
+
+```text
+conut-chief-operations-agent/
+│
+├── data/
+│   ├── clean_raw_data_notebook/    # Logic for parsing report-style CSVs
+│   ├── prepared data/              # Intermediate cleaned files
+│   └── model_ready/                # Final CSVs used by analytics modules
+│
+├── src/
+│   ├── agent.py                    # Main execution logic
+│   ├── api.py                      # Endpoint for serving insights
+│   ├── beverage_strategy.py        # Division performance analysis
+│   ├── combo.py                    # Market Basket Analysis (Apriori/Association)
+│   ├── expansion.py                # Branch scoring and feasibility logic
+│   ├── forecast.py                 # Time-series demand forecasting
+│   ├── schema.py                   # Data validation and types
+│   ├── staffing.py                 # Labor vs. Revenue efficiency module
+│   └── branch_json_export.py       # Final intelligence formatting
+│
+└── README.md
+```
+## 📊 Data Pipeline
+
+### 1️⃣ Data Cleaning
+
+Raw Excel datasets were cleaned and standardized.
+
+
+
+### 2️⃣ Feature Engineering
 
 Branch-level operational metrics were created including:
 
@@ -137,7 +140,7 @@ Branch-level operational metrics were created including:
 - Product-level aggregation
 - Customer-level purchase grouping
 
-3️⃣ Model-Ready Datasets
+### 3️⃣ Model-Ready Datasets
 
 Final structured datasets stored in: `data/prepared data/model_ready/`
 
@@ -145,16 +148,16 @@ These datasets are directly consumed by analytics modules.
 
 ---
 
-##🧠 Analytics Modules
-📈 1. Revenue Forecasting (`forecast.py`)
+## 🧠 Analytics Modules
+### 📈 1. Revenue Forecasting (`forecast.py`)
 - **Objective:** Predict short-term revenue for each branch.
-- **Methodology:** Rolling 14-day mean baseline forecasting
+- **Methodology:**
+    - Rolling 14-day mean baseline forecasting
+    - Branch-level aggregation
+    - Statistical summary reporting
 
-Branch-level aggregation
-
-Statistical summary reporting
-
-Output Structure:
+- **Output Structure:**
+```
 {
   "branch": "Conut - Tyre",
   "target_metric": "Total_Revenue",
@@ -162,174 +165,137 @@ Output Structure:
   "method": "rolling_mean_14_days",
   "forecast": [...]
 }
-Value:
+```
+- **Value:** Provides short-term operational visibility for planning and resource allocation.
 
-Provides short-term operational visibility for planning and resource allocation.
+### 🧩 2. Combo Recommendation Engine (`combo.py`)
+- **Objective:** Identify frequently co-purchased product pairs.
+- **Methodology:**
+    - Customer-level grouping
+    - Pairwise product combination analysis
+    - Minimum support threshold filtering
+    - Top-N selection
 
-🧩 2. Combo Recommendation Engine (combo.py)
-Objective:
-
-Identify frequently co-purchased product pairs.
-
-Methodology:
-
-Customer-level grouping
-
-Pairwise product combination analysis
-
-Minimum support threshold filtering
-
-Top-N selection
-
-Example Output:
+- **Example Output:**
+```
 {
   "item_a": "CLASSIC CHIMNEY",
   "item_b": "NUTELLA SPREAD CHIMNEY.",
   "support_customers": 3
 }
-Value:
+```
 
-Supports:
+- **Supports:**
+    - Cross-selling
+    - Bundling strategy
+    - Menu engineering
+    - Revenue optimization
 
-Cross-selling
+### 👥 3. Staffing Analysis (`staffing.py`)
+- **Objective:** Estimate branch workload pressure.
+- **Methodology:**
+    - Revenue proxy for operational intensity
+    - Branch comparison metrics
+    - Performance variability indicators
 
-Bundling strategy
+- **Supports:**
+    - Staffing optimization
+    - Shift planning
+    - Labor cost control
 
-Menu engineering
+### 📍 4. Expansion Feasibility Model (`expansion.py`)
+- **Objective:** Evaluate which branches demonstrate expansion readiness.
+- **Scoring Logic Includes:**
+    - Revenue consistency
+    - Stability indicators
+    - Performance thresholds
+    - Operational patterns
+- **Output:** Structured feasibility evaluation per branch.
+- **Value:** Supports strategic expansion decisions based on measurable criteria.
 
-Revenue optimization
+### 🗂 5. Branch Intelligence Export (`branch_json_export.py`)
+- **Objective:** Aggregate all branch-level analytics into one unified structured file.
+- **output file:** `branches_full_data.json`
+- **Purpose:**
+    - API-ready format
+    - LLM-ready structure
+    - Unified branch intelligence repository
 
-👥 3. Staffing Analysis (staffing.py)
-Objective:
+---
 
-Estimate branch workload pressure.
+## 🧪 Engineering Design Principles
 
-Methodology:
+- Modular architecture
+- Clear separation of concerns
+- Reproducible analytics
+- Branch-first data modeling
+- JSON structured outputs
+- Clean Git branch workflow
 
-Revenue proxy for operational intensity
+---
 
-Branch comparison metrics
-
-Performance variability indicators
-
-Value:
-
-Supports:
-
-Staffing optimization
-
-Shift planning
-
-Labor cost control
-
-📍 4. Expansion Feasibility Model (expansion.py)
-Objective:
-
-Evaluate which branches demonstrate expansion readiness.
-
-Scoring Logic Includes:
-
-Revenue consistency
-
-Stability indicators
-
-Performance thresholds
-
-Operational patterns
-
-Output:
-
-Structured feasibility evaluation per branch.
-
-Value:
-
-Supports strategic expansion decisions based on measurable criteria.
-
-🗂 5. Branch Intelligence Export (branch_json_export.py)
-Objective:
-
-Aggregate all branch-level analytics into one unified structured file.
-
-Output file:
-
-branches_full_data.json
-Purpose:
-
-API-ready format
-
-LLM-ready structure
-
-Unified branch intelligence repository
-
-🧪 Engineering Design Principles
-
-Modular architecture
-
-Clear separation of concerns
-
-Reproducible analytics
-
-Branch-first data modeling
-
-JSON structured outputs
-
-Clean Git branch workflow
-
-🔄 Git Workflow
+## 🔄 Git Workflow
 
 Project developed using structured branching strategy:
+```
+data-foundation   → cleaning & feature engineering
+analytics-models  → modeling & analytics layer
+main              → stable integrated version
+```
 
-data-foundation → data cleaning & feature engineering
+All modules were merged cleanly into `main` after validation.
 
-analytics-models → modeling & analytics layer
 
-main → stable integrated version
+---
 
-All modules were merged cleanly into main after validation.
-
-⚙️ Installation & Execution
-Clone
+## ⚙️ Installation & Execution
+### Clone Repository
+```
 git clone https://github.com/alcharkawimariam-Eng/conut-chief-operations-agent.git
 cd conut-chief-operations-agent
-Create Virtual Environment
+```
+### Create Virtual Environment
+```
 python -m venv .venv
 .venv\Scripts\activate
-Run Modules
+```
+
+### Run Modules
+```
 python src/forecast.py
 python src/combo.py
 python src/staffing.py
 python src/expansion.py
 python src/branch_json_export.py
-📈 Business Impact
+```
+
+---
+
+## 📈 Business Impact
 
 This system enables:
-
-Data-driven branch management
-
-Predictive operational planning
-
-Structured expansion evaluation
-
-Revenue optimization via combo intelligence
-
-Consolidated branch analytics
+- Data-driven branch management
+- Predictive operational planning
+- Structured expansion evaluation
+- Revenue optimization via combo intelligence
+- Consolidated branch analytics
 
 It transforms raw operational data into actionable intelligence.
 
-🚀 Future Enhancements
+---
 
-Machine Learning time-series forecasting (ARIMA, Prophet)
+## 🚀 Future Enhancements
 
-Real market basket mining (Apriori / FP-Growth)
+- Machine Learning time-series forecasting (ARIMA, Prophet)
+- Real market basket mining (Apriori / FP-Growth)
+- Automated model retraining
+- REST API deployment
+- Dashboard integration (Streamlit / FastAPI frontend)
+- Advanced staffing optimization model
 
-Automated model retraining
+---
 
-REST API deployment
-
-Dashboard integration (Streamlit / FastAPI frontend)
-
-Advanced staffing optimization model
-# 🏆 Key Achievements
+## 🏆 Key Achievements
 
 - Designed modular analytics architecture
 - Implemented multi-branch forecasting engine
@@ -339,12 +305,12 @@ Advanced staffing optimization model
 - Implemented clean Git branching workflow
 - Integrated all modules into production-ready main branch
 
-🏁 Conclusion
+---
+
+## 🏁 Conclusion
 
 The CONUT Chief Operations Agent demonstrates a full-stack analytics workflow:
 
-From raw operational data
-→ to structured modeling
-→ to decision-support outputs
+From Raw operational data → Structured Modeling → Decision-support outputs
 
 It showcases modular AI engineering, structured analytics thinking, and scalable branch-level intelligence design.# conut-chief-operations-agent
