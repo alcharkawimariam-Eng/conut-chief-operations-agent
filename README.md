@@ -1,13 +1,18 @@
-![Python](https://img.shields.io/badge/Python-3.11-blue)
-![Status](https://img.shields.io/badge/Project-Completed-success)
-![Architecture](https://img.shields.io/badge/Architecture-Modular-informational)
-![Hackathon](https://img.shields.io/badge/Event-AI%20Engineering%20Hackathon-orange)
+# 🥯 CONUT Chief Operations Agent
+### AI-Driven Multi-Branch Operational Intelligence System
 
-🚀 CONUT Chief Operations Agent
-AI-Driven Multi-Branch Operational Intelligence System
-🧠 Executive Summary
+<p align="left">
+  <img src="https://img.shields.io/badge/Python-3.11-blue" alt="Python">
+  <img src="https://img.shields.io/badge/Project-Completed-success" alt="Status">
+  <img src="https://img.shields.io/badge/Architecture-Modular-informational" alt="Architecture">
+  <img src="https://img.shields.io/badge/Event-AI%20Engineering%20Hackathon-orange" alt="Event">
+</p>
 
-The CONUT Chief Operations Agent is an AI-powered operational intelligence system designed to support strategic and tactical decision-making across multiple F&B branches.
+---
+
+## 🧠 Executive Summary
+
+The **CONUT Chief Operations Agent** is an end-to-end intelligence system designed to transform fragmented F&B operational data into a unified strategic compass. Developed during the **AI Engineering Hackathon**, this system bridges the gap between raw POS logs and executive-level decision-making.
 
 The system transforms structured operational data into:
 
@@ -21,9 +26,20 @@ The system transforms structured operational data into:
 
 🗂 Unified branch-level intelligence export
 
-This project was developed as part of an AI Engineering Hackathon to demonstrate end-to-end analytics design, from data preparation to decision-support modeling.
+---
 
-🎯 Problem Statement
+## 📍 Table of Contents
+- [🎯 Problem Statement](#-problem-statement)
+- [🏗 System Architecture](#-system-architecture)
+- [📂 Project Structure](#-project-structure)
+- [📊 Data Pipeline](#-data-pipeline)
+- [🧠 Analytics Modules](#-analytics-modules)
+- [⚙️ Installation & Execution](#-installation--execution)
+- [🏆 Key Achievements](#-key-achievements)
+
+---
+
+## 🎯 Problem Statement
 
 Multi-branch food and beverage businesses generate large volumes of transactional and operational data. However, most organizations lack:
 
@@ -39,11 +55,12 @@ Multi-branch food and beverage businesses generate large volumes of transactiona
 * Operational inefficiencies.
 * Underutilized data assets.
 
-**The goal of this project** was to design a modular analytics engine that converts raw, report-style branch data into actionable operational intelligence.
+
+> **Goal:** Design a modular analytics engine that converts raw, report-style branch data into **Actionable JSON Intelligence.**
 
 ---
 
-🏗 System Architecture
+## 🏗 System Architecture
 
 The project follows a layered, modular architecture designed for scalability:
 
@@ -55,7 +72,7 @@ The project follows a layered, modular architecture designed for scalability:
 
 Each analytics module operates independently but shares a common branch-centric design.
 
-## 📂 Project Structure
+### 📂 Project Structure
 
 ```text
 conut-chief-operations-agent/
@@ -82,7 +99,8 @@ conut-chief-operations-agent/
 1️⃣ Data Cleaning
 
 Raw Excel datasets were cleaned and standardized.
-## 🧱 High-Level Architecture
+
+### 🧱 High-Level Architecture
 
 ```text
             ┌────────────────────┐
@@ -114,31 +132,23 @@ Raw Excel datasets were cleaned and standardized.
 
 Branch-level operational metrics were created including:
 
-Daily revenue
-
-Transaction counts
-
-Product-level aggregation
-
-Customer-level purchase grouping
+- Daily revenue
+- Transaction counts
+- Product-level aggregation
+- Customer-level purchase grouping
 
 3️⃣ Model-Ready Datasets
 
-Final structured datasets stored in:
-
-data/prepared data/model_ready/
+Final structured datasets stored in: `data/prepared data/model_ready/`
 
 These datasets are directly consumed by analytics modules.
 
-🧠 Analytics Modules
-📈 1. Revenue Forecasting (forecast.py)
-Objective:
+---
 
-Predict short-term revenue for each branch.
-
-Methodology:
-
-Rolling 14-day mean baseline forecasting
+##🧠 Analytics Modules
+📈 1. Revenue Forecasting (`forecast.py`)
+- **Objective:** Predict short-term revenue for each branch.
+- **Methodology:** Rolling 14-day mean baseline forecasting
 
 Branch-level aggregation
 
