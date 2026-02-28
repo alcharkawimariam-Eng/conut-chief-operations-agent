@@ -153,3 +153,19 @@ class DivisionRow(BranchBase):
 # -------------------------------------------------------------------
 
 ModelRow = BranchMasterRow | BranchDailyOpsRow | CustomerRow | ItemGroupRow | SalesDetailRow | AvgMenuRow | DivisionRow
+SALES_COLUMNS = [
+    "date",
+    "branch_id",
+    "item_name",
+    "category",
+    "quantity",
+    "revenue"
+]
+
+ATTENDANCE_COLUMNS = [
+    "date",
+    "branch_id",
+    "employee_id",
+    "shift",
+    "hours"
+]
