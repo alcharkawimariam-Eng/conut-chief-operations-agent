@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 import time, uuid
+import json
 
 app = FastAPI()
 
@@ -18,10 +19,46 @@ class ComboRequest(BaseModel):
     branch_id: str
 
 # ------------------- Routes -------------------
+def _get_last_user_text(messages):
+    # OpenAI/OpenClaw can send content as string OR list of parts
+    for m in reversed(messages or []):
+        if m.get("role") != "user":
+            continue
+        c = m.get("content")
+        if isinstance(c, str):
+            return c
+        if isinstance(c, list):
+            # parts like [{"type":"text","text":"..."}]
+            texts = []
+            for part in c:
+                if isinstance(part, dict) and part.get("type") == "text":
+                    texts.append(part.get("text", ""))
+            return "".join(texts).strip()
+    return ""
+
 
 @app.get("/")
 def root():
     return {"status": "Chief of Operations Agent running"}
+
+def content_to_text(content):
+    # OpenAI-style: content can be a string OR a list of parts like:
+    # [{"type":"text","text":"hello"}]
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        texts = []
+        for part in content:
+            if isinstance(part, str):
+                texts.append(part)
+            elif isinstance(part, dict):
+                # common keys
+                if "text" in part and isinstance(part["text"], str):
+                    texts.append(part["text"])
+                elif part.get("type") in ("input_text", "output_text", "text") and isinstance(part.get("text"), str):
+                    texts.append(part["text"])
+        return " ".join(texts)
+    return ""
 
 @app.get("/v1/models")
 def v1_models():
@@ -41,69 +78,105 @@ def v1_models():
 async def v1_chat_completions(req: Request):
     payload = await req.json()
     messages = payload.get("messages", [])
+    stream = bool(payload.get("stream", False))
+    include_usage = bool((payload.get("stream_options") or {}).get("include_usage", False))
 
-    last_user = ""
-    for m in reversed(messages):
-        if m.get("role") == "user":
-            last_user = m.get("content", "")
-            break
+    user_text = _get_last_user_text(messages)
 
-text = (last_user or "").strip()
-low = text.lower()
+    # TODO: replace this with your real model call
+    reply_text = f"Forecast for {user_text}: dummy_prediction. Recommendation: Increase inventory by 10%."
 
-def pick_last_token(s: str) -> str:
-    parts = s.split()
-    return parts[-1] if parts else ""
+    chat_id = f"chatcmpl-{uuid.uuid4().hex}"
+    model_name = payload.get("model", "dummy-model")
+    created = int(time.time())
 
-if "forecast" in low:
-    # example: "forecast B001"
-    branch = pick_last_token(text)
-    result = forecast(ForecastRequest(branch_id=branch))
-    dummy_text = str(result)
+    if not stream:
+        return JSONResponse({
+    "id": chat_id,
+    "object": "chat.completion",
+    "created": created,
+    "model": model_name,
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": reply_text
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+    }
+})
+    
 
-elif "staff" in low or "staffing" in low:
-    # example: "staffing B001 morning"
-    parts = text.split()
-    branch = parts[1] if len(parts) >= 2 else ""
-    shift  = parts[2] if len(parts) >= 3 else "morning"
-    result = staffing(StaffingRequest(branch_id=branch, shift=shift))
-    dummy_text = str(result)
+    # ---- STREAMING (SSE) ----
+    def sse(data: dict) -> str:
+        return f"data: {json.dumps(data, ensure_ascii=False)}\n\n"
 
-elif "combo" in low:
-    # example: "combo B001"
-    branch = pick_last_token(text)
-    result = combo(ComboRequest(branch_id=branch))
-    dummy_text = str(result)
+    async def gen():
+        # 1) initial chunk (role)
+        yield sse({
+            "id": chat_id,
+            "object": "chat.completion.chunk",
+            "created": created,
+            "model": model_name,
+            "choices": [{"index": 0, "delta": {"role": "assistant"}, "finish_reason": None}],
+        })
 
-elif "expansion" in low:
-    dummy_text = str(expansion())
+        # 2) content chunks (split a bit so UI renders)
+        chunk_size = 40
+        for i in range(0, len(reply_text), chunk_size):
+            yield sse({
+                "id": chat_id,
+                "object": "chat.completion.chunk",
+                "created": created,
+                "model": model_name,
+                "choices": [{"index": 0, "delta": {"content": reply_text[i:i+chunk_size]}, "finish_reason": None}],
+            })
 
-elif "beverage" in low:
-    dummy_text = str(beverage_strategy())
+        # 3) final chunk (finish_reason + optional usage)
+        final = {
+            "id": chat_id,
+            "object": "chat.completion.chunk",
+            "created": created,
+            "model": model_name,
+            "choices": [{"index": 0, "delta": {}, "finish_reason": "stop"}],
+        }
+        if include_usage:
+            final["usage"] = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
-else:
-    dummy_text = (
-        "Say one of these:\n"
-        "- forecast <branch_id>\n"
-        "- staffing <branch_id> <shift>\n"
-        "- combo <branch_id>\n"
-        "- expansion\n"
-        "- beverage"
-    )
-    return JSONResponse({
-        "id": f"chatcmpl-{uuid.uuid4().hex}",
-        "object": "chat.completion",
-        "created": int(time.time()),
-        "model": payload.get("model", "dummy-model"),
-        "choices": [
-            {
-                "index": 0,
-                "message": {"role": "assistant", "content": dummy_text},
-                "finish_reason": "stop"
-            }
-        ],
-        "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
-    })
+        yield sse(final)
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(gen(), media_type="text/event-stream")
+
+
+
+
+# --- OpenClaw/vLLM compatibility aliases ---
+
+@app.get("/models")
+def models_alias():
+    return v1_models()
+
+@app.post("/chat/completions")
+async def chat_completions_alias(req: Request):
+    payload = await req.json()
+    print("=== /chat/completions payload ===")
+    print(payload)
+    print("=================================")
+    # re-create the request handling by calling the same logic:
+    # simplest: just call the same function again by reusing payload (we’ll fix next step)
+    return await v1_chat_completions(req)
+
+@app.post("/responses")
+async def responses_alias(req: Request):
+    return await v1_responses(req)
 
 @app.post("/v1/responses")
 async def v1_responses(req: Request):
@@ -174,4 +247,3 @@ def beverage_strategy():
             "Offer 5-7 PM beverage discount"
         ]
     }
-
