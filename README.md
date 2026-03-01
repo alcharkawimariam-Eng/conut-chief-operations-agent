@@ -245,6 +245,52 @@ main              → stable integrated version
 
 All modules were merged cleanly into `main` after validation.
 
+🧠 OpenClaw Integration (AI Ops Agent)
+
+This project integrates a FastAPI backend with an OpenClaw Gateway Agent to provide conversational access to operational models (forecasting, staffing, etc.).
+
+🏗 Architecture
+
+User → OpenClaw → FastAPI API → Router → Runner → Forecast Model → Formatter → Chat
+
+The agent supports natural commands such as:
+
+forecast B1
+forecast B1 2026-03-05
+staffing B2 shift A
+
+Branch aliases are mapped internally:
+
+Alias	Branch Name
+B1	CONUT JNAH
+B2	CONUT - TYRE
+B3	MAIN STREET COFFEE
+🚀 Running the API Locally
+1️⃣ Activate virtual environment
+source .venv/Scripts/activate   # Windows (Git Bash)
+2️⃣ Start FastAPI server
+uvicorn src.api:app --reload
+
+The API will run on:
+
+http://127.0.0.1:8000
+🤖 Running OpenClaw Gateway
+
+Start OpenClaw locally:
+
+openclaw gateway run --port 18789
+
+Then open in browser:
+
+http://127.0.0.1:18789
+
+The agent can now respond to forecast queries via chat.
+
+📸 Example Output
+
+Below is an example forecast response from OpenClaw:
+<img width="1907" height="978" alt="forecasting_verygood" src="https://github.com/user-attachments/assets/ed26cdbf-5888-4064-942e-125f429c0a1a" />
+<img width="1912" height="988" alt="forecasting_excellent" src="https://github.com/user-attachments/assets/5248a387-8de0-455b-b88d-7d8842936450" />
 
 ---
 
