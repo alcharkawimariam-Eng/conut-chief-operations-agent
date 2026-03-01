@@ -1,3 +1,18 @@
-.venv/
+# Python
 __pycache__/
 *.pyc
+
+# Virtual env
+.venv/
+venv/
+env/
+
+# Data (don’t push CSVs)
+data/
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

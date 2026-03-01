@@ -3,17 +3,15 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import Dict, Any, List
 from pathlib import Path
-
 import pandas as pd
 
 # -------------------------------------------------------------------
 # 1) EXACT DATA FILE PATH YOU GAVE ME
 # -------------------------------------------------------------------
 
-DATA_FILE = Path(
-    r"C:\Users\user\Desktop\conut-chief-operations-agent\conut-chief-operations-agent\data\prepared data\model_ready\model_branch_daily_ops.csv"
-)
+BASE_DIR = Path(__file__).resolve().parent.parent
 
+DATA_FILE = BASE_DIR / "data" / "prepared data" / "model_ready" / "model_branch_daily_ops.csv"
 if not DATA_FILE.exists():
     raise FileNotFoundError(f"Data file not found at: {DATA_FILE}")
 
@@ -44,14 +42,26 @@ def make_branch_forecast(
     if missing:
         raise ValueError(f"Missing required columns in data: {missing}")
 
+    # Normalize branch input + branch column values (handles spaces/case)
+    branch_name_norm = str(branch_name).strip().upper()
+    df_daily = df_daily.copy()
+    df_daily[branch_col] = df_daily[branch_col].astype(str).str.strip().str.upper()
+
     # Filter for the requested branch
-    df_branch = df_daily[df_daily[branch_col] == branch_name].copy()
+    df_branch = df_daily[df_daily[branch_col] == branch_name_norm].copy()
     if df_branch.empty:
-        raise ValueError(f"No data found for branch={branch_name!r}")
+        available = sorted(df_daily[branch_col].dropna().unique().tolist())[:20]
+        raise ValueError(
+            f"No data found for branch={branch_name!r} (normalized='{branch_name_norm}'). "
+            f"Example available branches: {available}"
+        )
 
     # Ensure proper types and sort by date
-    df_branch[date_col] = pd.to_datetime(df_branch[date_col])
-    df_branch = df_branch.sort_values(date_col)
+    df_branch[date_col] = pd.to_datetime(df_branch[date_col], errors="coerce")
+    df_branch = df_branch.dropna(subset=[date_col]).sort_values(date_col)
+
+    if df_branch.empty:
+        raise ValueError(f"Branch {branch_name!r} has no valid dates in column {date_col!r}.")
 
     # Rolling mean baseline over the last window_days
     df_branch["rolling_mean"] = (
@@ -81,7 +91,7 @@ def make_branch_forecast(
     hist_series = df_branch[target_col]
 
     result: Dict[str, Any] = {
-        "branch": str(branch_name),
+        "branch": str(branch_name_norm),
         "target_metric": target_col,
         "horizon_days": horizon_days,
         "method": f"rolling_mean_{window_days}_days",
@@ -98,7 +108,6 @@ def make_branch_forecast(
     }
 
     return result
-
 
 # -------------------------------------------------------------------
 # 3) MAIN: LOAD DATA & RUN FORECAST FOR ONE BRANCH
@@ -161,3 +170,22 @@ def forecast_branch(branch_id, horizon=30, file_path="data/clean/monthly_branch_
         "confidence": "medium",
         "forecast": forecast_values
     }
+
+def predict(branch: str, date: str | None = None):
+    """
+    Wrapper function used by the Ops Agent.
+    Loads data and calls make_branch_forecast properly.
+    """
+
+    df_daily = pd.read_csv(DATA_FILE)
+
+    print("BRANCH COLUMN CANDIDATES:", [c for c in df_daily.columns if "branch" in c.lower()])
+    for c in df_daily.columns:
+        if "branch" in c.lower():
+            print("SAMPLE VALUES IN", c, ":", df_daily[c].astype(str).unique()[:10])
+
+    result = make_branch_forecast(
+        df_daily=df_daily,
+        branch_name=branch,
+    )
+    return result

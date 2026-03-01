@@ -3,6 +3,9 @@ from pydantic import BaseModel
 from fastapi.responses import JSONResponse, StreamingResponse
 import time, uuid
 import json
+from src.ops_agent.router import route_intent
+from src.ops_agent.runner import run_intent
+from src.ops_agent.formatter import format_exec_answer
 
 app = FastAPI()
 
@@ -84,7 +87,9 @@ async def v1_chat_completions(req: Request):
     user_text = _get_last_user_text(messages)
 
     # TODO: replace this with your real model call
-    reply_text = f"Forecast for {user_text}: dummy_prediction. Recommendation: Increase inventory by 10%."
+    intent = route_intent(user_text)
+    result = run_intent(intent)
+    reply_text = format_exec_answer(intent, result)
 
     chat_id = f"chatcmpl-{uuid.uuid4().hex}"
     model_name = payload.get("model", "dummy-model")
@@ -111,7 +116,7 @@ async def v1_chat_completions(req: Request):
         "completion_tokens": 0,
         "total_tokens": 0
     }
-      })
+})
     
 
     # ---- STREAMING (SSE) ----
